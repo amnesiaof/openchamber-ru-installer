@@ -162,7 +162,7 @@ if ($stamp -and $stamp.appVersion -and $appVersion -ne 'unknown' -and $stamp.app
 }
 
 Write-Step 'Удаляю ru-*.js чанки...'
-$ruFiles = Get-ChildItem -LiteralPath $assets -Filter 'ru-*.js' -ErrorAction SilentlyContinue
+$ruFiles = Get-ChildItem -LiteralPath $assets -Filter 'ru-*.js' -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^ru-[0-9a-f]{8}\.js$' }
 foreach ($f in $ruFiles) {
   Remove-Item -LiteralPath $f.FullName -Force
   Write-Ok "  Удалён $($f.Name)"
@@ -222,7 +222,7 @@ if (Test-Path -LiteralPath $stampPath) {
 
 Write-Step 'Проверяю удаление...'
 $verifyOk = $true
-$leftRu = @(Get-ChildItem -LiteralPath $assets -Filter 'ru-*.js' -ErrorAction SilentlyContinue)
+$leftRu = @(Get-ChildItem -LiteralPath $assets -Filter 'ru-*.js' -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^ru-[0-9a-f]{8}\.js$' })
 if ($leftRu.Count -gt 0) { Write-Err ("  остались чанки: " + (($leftRu | ForEach-Object { $_.Name }) -join ', ')); $verifyOk = $false }
 $leftBak = @(Get-ChildItem -LiteralPath $assets -Filter '*.bak' -ErrorAction SilentlyContinue)
 if ($leftBak.Count -gt 0) { Write-Warn ("  остались бэкапы: " + (($leftBak | ForEach-Object { $_.Name }) -join ', ')) }
