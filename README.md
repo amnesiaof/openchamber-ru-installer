@@ -9,19 +9,23 @@
 Скачивать ZIP не нужно — установщик сам заберёт перевод с GitHub:
 
 ```powershell
-irm https://raw.githubusercontent.com/kotobarsik/openchamber-ru-installer/main/install-desktop-ru.ps1 | iex
+irm https://raw.githubusercontent.com/kotobarsik/openchamber-ru-installer/main/install.ps1 | iex
 ```
 
 Удаление — так же одной командой:
 
 ```powershell
-irm https://raw.githubusercontent.com/kotobarsik/openchamber-ru-installer/main/uninstall-desktop-ru.ps1 | iex
+irm https://raw.githubusercontent.com/kotobarsik/openchamber-ru-installer/main/uninstall.ps1 | iex
 ```
 
 Перевод каждый раз качается заново, поэтому повторный запуск команды — это и есть обновление перевода.
 
+`install.ps1` и `uninstall.ps1` — короткие загрузчики, которые тянут основной скрипт и запускают его.
+Нужен именно этот URL, а не `install-desktop-ru.ps1` напрямую: Windows PowerShell 5.1 не убирает BOM
+из скачанного текста, и `iex` попытается выполнить его как команду, выдав ошибку в самом начале.
+
 Если кажется, что скачалась старая версия: GitHub кеширует ответы ~5 минут, добавьте к URL случайный хвост —
-`...install-desktop-ru.ps1?$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())`.
+`...install.ps1?$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())`.
 
 > Скрипт выполняется прямо в вашей сессии PowerShell. `irm ... | iex` запускает код из интернета —
 > это то же, что делают `winget`, `oh-my-posh` и scoop. Репозиторий публичный, так что изменения в нём видны всем.
@@ -62,6 +66,7 @@ irm https://raw.githubusercontent.com/kotobarsik/openchamber-ru-installer/main/u
 ## Что входит
 - `install-desktop-ru.cmd` / `install-desktop-ru.ps1` — установщик.
 - `uninstall-desktop-ru.cmd` / `uninstall-desktop-ru.ps1` — удаление.
+- `install.ps1` / `uninstall.ps1` — загрузчики для запуска одной командой из сети.
 - `i18n/messages/ru.ts` / `i18n/messages/ru.settings.ts` — исходники перевода (7309 ключей, полное покрытие словаря v2.2.0; сверено со всем графом импортов английского словаря `en.ts` + `en.settings.ts` + 19 общих `*.i18n.ts`: нет пропусков, нет устаревших ключей, плейсхолдеры `{…}` совпадают).
 
 ## Флаги и автоматизация
