@@ -137,10 +137,15 @@ function Get-MessagesFile {
   $cacheDir = Join-Path $env:TEMP 'openchamber-ru'
   if (-not (Test-Path -LiteralPath $cacheDir)) { New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null }
   $out = Join-Path $cacheDir $Name
-  $url = "$script:SourceBase/i18n/messages/$Name`?$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
+  # ${Name}, а не $Name? — в PowerShell '?' допустим в имени переменной,
+  # и без скобок URL остался бы без имени файла.
+  $url = "$script:SourceBase/i18n/messages/${Name}?$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())"
   Write-Step "Скачиваю перевод: $Name"
-  Invoke-WebRequest -Uri $url -OutFile $out -UseBasicParsing -Headers @{ 'Cache-Control' = 'no-cache' }
-  if (-not (Test-Path -LiteralPath $out)) { throw "Не удалось скачать перевод: $url" }
+  try {
+    Invoke-WebRequest -Uri $url -OutFile $out -UseBasicParsing -Headers @{ 'Cache-Control' = 'no-cache' }
+  } catch {
+    throw ("Не удалось скачать перевод ({0}): {1}. Проверьте интернет или задайте другой адрес через OC_RU_SOURCE." -f $Name, $_.Exception.Message)
+  }
   return $out
 }
 
